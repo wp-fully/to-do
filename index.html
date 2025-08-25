@@ -372,7 +372,6 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            width: fit-content;
         }
 
         .calendar-widget, .team-widget {
@@ -387,6 +386,30 @@
             font-weight: bold;
             margin-bottom: 20px;
             color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .widget-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .widget-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
         }
 
         .calendar {
@@ -423,6 +446,7 @@
             border-radius: 8px;
             margin-bottom: 10px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .team-member:hover {
@@ -439,6 +463,7 @@
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 14px;
         }
 
         .member-info {
@@ -453,6 +478,40 @@
         .member-tasks {
             color: var(--text-secondary);
             font-size: 12px;
+        }
+
+        .member-role {
+            color: var(--primary-color);
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .team-member:hover .member-actions {
+            opacity: 1;
+        }
+
+        .member-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .member-action-btn:hover {
+            color: var(--danger-color);
+            background: var(--bg-secondary);
         }
 
         .modal {
@@ -483,6 +542,10 @@
             overflow-y: auto;
             box-shadow: var(--shadow-lg);
             animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-content.small {
+            max-width: 500px;
         }
 
         @keyframes modalSlideIn {
@@ -620,16 +683,54 @@
             box-shadow: var(--shadow-lg);
         }
 
-        .no-tasks {
+        .no-tasks, .no-members {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-secondary);
         }
 
-        .no-tasks i {
+        .no-tasks i, .no-members i {
             font-size: 64px;
             margin-bottom: 20px;
             opacity: 0.5;
+        }
+
+        .no-members {
+            padding: 40px 20px;
+        }
+
+        .no-members i {
+            font-size: 48px;
+        }
+
+        .avatar-colors {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--bg-primary);
         }
 
         @media (max-width: 1024px) {
@@ -789,8 +890,10 @@
             <div class="sidebar">
                 <div class="calendar-widget">
                     <h3 class="widget-title">
-                        <i class="fas fa-calendar"></i>
-                        التقويم
+                        <span>
+                            <i class="fas fa-calendar"></i>
+                            التقويم
+                        </span>
                     </h3>
                     <div class="calendar" id="calendar">
                         <!-- سيتم إنشاء التقويم بواسطة JavaScript -->
@@ -799,30 +902,24 @@
 
                 <div class="team-widget">
                     <h3 class="widget-title">
-                        <i class="fas fa-users"></i>
-                        فريق العمل
+                        <span>
+                            <i class="fas fa-users"></i>
+                            فريق العمل (<span id="teamCount">0</span>)
+                        </span>
+                        <div class="widget-actions">
+                            <button class="widget-btn" onclick="openTeamModal()" title="إضافة عضو جديد">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="widget-btn" onclick="manageTeam()" title="إدارة الفريق">
+                                <i class="fas fa-cogs"></i>
+                            </button>
+                        </div>
                     </h3>
                     <div id="teamMembers">
-                        <div class="team-member">
-                            <div class="member-avatar">أح</div>
-                            <div class="member-info">
-                                <div class="member-name">أحمد محمد</div>
-                                <div class="member-tasks">3 مهام نشطة</div>
-                            </div>
-                        </div>
-                        <div class="team-member">
-                            <div class="member-avatar">س</div>
-                            <div class="member-info">
-                                <div class="member-name">سارة أحمد</div>
-                                <div class="member-tasks">2 مهام نشطة</div>
-                            </div>
-                        </div>
-                        <div class="team-member">
-                            <div class="member-avatar">م</div>
-                            <div class="member-info">
-                                <div class="member-name">محمد علي</div>
-                                <div class="member-tasks">1 مهمة نشطة</div>
-                            </div>
+                        <div class="no-members">
+                            <i class="fas fa-users"></i>
+                            <h4>لا يوجد أعضاء في الفريق</h4>
+                            <p>أضف أعضاء جدد للبدء</p>
                         </div>
                     </div>
                 </div>
@@ -868,9 +965,7 @@
                     <div class="form-group">
                         <label class="form-label">المسؤول</label>
                         <select class="form-select" id="taskAssignee">
-                            <option value="أحمد محمد">أحمد محمد</option>
-                            <option value="سارة أحمد">سارة أحمد</option>
-                            <option value="محمد علي">محمد علي</option>
+                            <option value="">اختر المسؤول</option>
                         </select>
                     </div>
                 </div>
@@ -880,7 +975,10 @@
                         <label class="form-label">المشروع/القسم</label>
                         <select class="form-select" id="taskProject">
                             <option value="تطوير المواقع">تطوير المواقع</option>
-                            <option value="عام"> عام</option>
+                            <option value="التسويق">التسويق</option>
+                            <option value="المبيعات">المبيعات</option>
+                            <option value="الدعم الفني">الدعم الفني</option>
+                            <option value="عام">عام</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -935,18 +1033,110 @@
         </div>
     </div>
 
+    <!-- Team Member Modal -->
+    <div class="modal" id="teamModal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3 class="modal-title" id="teamModalTitle">إضافة عضو جديد</h3>
+                <button class="close-btn" onclick="closeTeamModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="teamForm">
+                <div class="form-group">
+                    <label class="form-label">اسم العضو</label>
+                    <input type="text" class="form-input" id="memberName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-input" id="memberEmail">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">المنصب/الدور</label>
+                    <select class="form-select" id="memberRole">
+                        <option value="مطور">مطور</option>
+                        <option value="مصمم">مصمم</option>
+                        <option value="مدير مشروع">مدير مشروع</option>
+                        <option value="محلل أعمال">محلل أعمال</option>
+                        <option value="مختبر جودة">مختبر جودة</option>
+                        <option value="مسوق">مسوق</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">القسم</label>
+                    <select class="form-select" id="memberDepartment">
+                        <option value="تطوير المواقع">تطوير المواقع</option>
+                        <option value="التصميم">التصميم</option>
+                        <option value="التسويق">التسويق</option>
+                        <option value="المبيعات">المبيعات</option>
+                        <option value="الدعم الفني">الدعم الفني</option>
+                        <option value="الإدارة">الإدارة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input type="tel" class="form-input" id="memberPhone">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">لون الصورة الرمزية</label>
+                    <div class="avatar-colors" id="avatarColors">
+                        <!-- سيتم إنشاؤها بواسطة JavaScript -->
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="teamSubmitBtn">
+                    <i class="fas fa-save"></i>
+                    حفظ العضو
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Team Management Modal -->
+    <div class="modal" id="teamManageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إدارة فريق العمل</h3>
+                <button class="close-btn" onclick="closeTeamManageModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="teamManageContent">
+                <!-- سيتم ملؤها بواسطة JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [];
         let currentFilter = 'all';
         let editingTaskId = null;
+        let editingMemberId = null;
         let currentTheme = localStorage.getItem('theme') || 'light';
+
+        // Avatar colors for team members
+        const avatarColors = [
+            '#6366f1', '#8b5cf6', '#10b981', '#f59e0b',
+            '#ef4444', '#06b6d4', '#84cc16', '#f97316',
+            '#ec4899', '#64748b', '#14b8a6', '#a855f7'
+        ];
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             initializeTheme();
             generateCalendar();
+            initializeAvatarColors();
             renderTasks();
+            renderTeamMembers();
+            updateTaskAssigneeOptions();
             updateStats();
             
             // Set default deadline to tomorrow
@@ -968,15 +1158,361 @@
             initializeTheme();
         }
 
+        // Avatar colors initialization
+        function initializeAvatarColors() {
+            const container = document.getElementById('avatarColors');
+            container.innerHTML = '';
+            
+            avatarColors.forEach((color, index) => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'color-option';
+                colorDiv.style.background = color;
+                colorDiv.dataset.color = color;
+                colorDiv.textContent = 'أ';
+                colorDiv.onclick = () => selectAvatarColor(colorDiv);
+                
+                if (index === 0) colorDiv.classList.add('selected');
+                container.appendChild(colorDiv);
+            });
+        }
+
+        function selectAvatarColor(element) {
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        // Team Members Management
+        function openTeamModal(memberId = null) {
+            const modal = document.getElementById('teamModal');
+            const modalTitle = document.getElementById('teamModalTitle');
+            const submitBtn = document.getElementById('teamSubmitBtn');
+            
+            editingMemberId = memberId;
+            
+            if (memberId) {
+                const member = teamMembers.find(m => m.id === memberId);
+                modalTitle.textContent = 'تعديل العضو';
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> تحديث العضو';
+                fillTeamForm(member);
+            } else {
+                modalTitle.textContent = 'إضافة عضو جديد';
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ العضو';
+                clearTeamForm();
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeTeamModal() {
+            document.getElementById('teamModal').classList.remove('active');
+            clearTeamForm();
+            editingMemberId = null;
+        }
+
+        function fillTeamForm(member) {
+            document.getElementById('memberName').value = member.name;
+            document.getElementById('memberEmail').value = member.email || '';
+            document.getElementById('memberRole').value = member.role || '';
+            document.getElementById('memberDepartment').value = member.department || '';
+            document.getElementById('memberPhone').value = member.phone || '';
+            
+            // Select avatar color
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.dataset.color === member.avatarColor) {
+                    el.classList.add('selected');
+                }
+            });
+        }
+
+        function clearTeamForm() {
+            document.getElementById('teamForm').reset();
+            document.querySelectorAll('.color-option').forEach((el, index) => {
+                el.classList.remove('selected');
+                if (index === 0) el.classList.add('selected');
+            });
+        }
+
+        // Team form submission
+        document.getElementById('teamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedColor = document.querySelector('.color-option.selected');
+            const formData = {
+                id: editingMemberId || generateId(),
+                name: document.getElementById('memberName').value,
+                email: document.getElementById('memberEmail').value,
+                role: document.getElementById('memberRole').value,
+                department: document.getElementById('memberDepartment').value,
+                phone: document.getElementById('memberPhone').value,
+                avatarColor: selectedColor ? selectedColor.dataset.color : avatarColors[0],
+                createdAt: editingMemberId ? teamMembers.find(m => m.id === editingMemberId).createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            if (editingMemberId) {
+                const index = teamMembers.findIndex(m => m.id === editingMemberId);
+                teamMembers[index] = formData;
+            } else {
+                teamMembers.push(formData);
+            }
+            
+            saveTeamMembers();
+            renderTeamMembers();
+            updateTaskAssigneeOptions();
+            closeTeamModal();
+            
+            showNotification(editingMemberId ? 'تم تحديث العضو بنجاح' : 'تم إضافة العضو بنجاح', 'success');
+        });
+
+        function saveTeamMembers() {
+            localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
+        }
+
+        function renderTeamMembers() {
+            const container = document.getElementById('teamMembers');
+            const teamCount = document.getElementById('teamCount');
+            
+            teamCount.textContent = teamMembers.length;
+            
+            if (teamMembers.length === 0) {
+                container.innerHTML = `
+                    <div class="no-members">
+                        <i class="fas fa-users"></i>
+                        <h4>لا يوجد أعضاء في الفريق</h4>
+                        <p>أضف أعضاء جدد للبدء</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = teamMembers.map(member => {
+                const activeTasks = tasks.filter(task => 
+                    task.assignee === member.name && task.status !== 'completed'
+                ).length;
+                
+                return `
+                    <div class="team-member" data-member-id="${member.id}">
+                        <div class="member-avatar" style="background: ${member.avatarColor}">
+                            ${getInitials(member.name)}
+                        </div>
+                        <div class="member-info">
+                            <div class="member-role">${member.role || 'عضو فريق'}</div>
+                            <div class="member-name">${member.name}</div>
+                            <div class="member-tasks">${activeTasks} مهام نشطة</div>
+                        </div>
+                        <div class="member-actions">
+                            <button class="member-action-btn" onclick="openTeamModal('${member.id}')" title="تعديل">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="member-action-btn" onclick="deleteMember('${member.id}')" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').substring(0, 2);
+        }
+
+        function deleteMember(memberId) {
+            const member = teamMembers.find(m => m.id === memberId);
+            if (confirm(`هل أنت متأكد من حذف ${member.name} من الفريق؟`)) {
+                // Check if member has assigned tasks
+                const assignedTasks = tasks.filter(task => task.assignee === member.name);
+                
+                if (assignedTasks.length > 0) {
+                    if (confirm(`هذا العضو لديه ${assignedTasks.length} مهام مسندة إليه. هل تريد المتابعة؟`)) {
+                        // Remove assignee from tasks
+                        assignedTasks.forEach(task => {
+                            task.assignee = '';
+                            task.updatedAt = new Date().toISOString();
+                        });
+                        saveTasks();
+                        renderTasks();
+                    } else {
+                        return;
+                    }
+                }
+                
+                teamMembers = teamMembers.filter(m => m.id !== memberId);
+                saveTeamMembers();
+                renderTeamMembers();
+                updateTaskAssigneeOptions();
+                showNotification('تم حذف العضو بنجاح', 'success');
+            }
+        }
+
+        function updateTaskAssigneeOptions() {
+            const assigneeSelect = document.getElementById('taskAssignee');
+            assigneeSelect.innerHTML = '<option value="">اختر المسؤول</option>';
+            
+            teamMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.name;
+                option.textContent = `${member.name} (${member.role || 'عضو فريق'})`;
+                assigneeSelect.appendChild(option);
+            });
+        }
+
+        function manageTeam() {
+            const modal = document.getElementById('teamManageModal');
+            const content = document.getElementById('teamManageContent');
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <button class="widget-btn" onclick="openTeamModal()" style="margin-right: 10px;">
+                        <i class="fas fa-plus"></i>
+                        إضافة عضو جديد
+                    </button>
+                    <button class="widget-btn" onclick="exportTeam()" style="margin-right: 10px;">
+                        <i class="fas fa-download"></i>
+                        تصدير القائمة
+                    </button>
+                    <button class="widget-btn" onclick="importTeam()">
+                        <i class="fas fa-upload"></i>
+                        استيراد قائمة
+                    </button>
+                </div>
+                
+                ${teamMembers.length === 0 ? `
+                    <div class="no-members">
+                        <i class="fas fa-users"></i>
+                        <h4>لا يوجد أعضاء في الفريق</h4>
+                        <p>أضف أعضاء جدد للبدء</p>
+                    </div>
+                ` : `
+                    <div style="display: grid; gap: 15px;">
+                        ${teamMembers.map(member => {
+                            const activeTasks = tasks.filter(task => 
+                                task.assignee === member.name && task.status !== 'completed'
+                            ).length;
+                            const completedTasks = tasks.filter(task => 
+                                task.assignee === member.name && task.status === 'completed'
+                            ).length;
+                            
+                            return `
+                                <div style="border: 2px solid var(--border-color); border-radius: 10px; padding: 20px;">
+                                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                        <div class="member-avatar" style="background: ${member.avatarColor}">
+                                            ${getInitials(member.name)}
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <h4>${member.name}</h4>
+                                            <div style="color: var(--primary-color); font-size: 14px; font-weight: bold;">${member.role || 'عضو فريق'}</div>
+                                            <div style="color: var(--text-secondary); font-size: 12px;">${member.department || 'غير محدد'}</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <button class="action-btn edit-btn" onclick="openTeamModal('${member.id}')" style="margin-right: 5px;">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete-btn" onclick="deleteMember('${member.id}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 14px;">
+                                        ${member.email ? `
+                                            <div class="detail-item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span>${member.email}</span>
+                                            </div>
+                                        ` : ''}
+                                        ${member.phone ? `
+                                            <div class="detail-item">
+                                                <i class="fas fa-phone"></i>
+                                                <span>${member.phone}</span>
+                                            </div>
+                                        ` : ''}
+                                        <div class="detail-item">
+                                            <i class="fas fa-tasks"></i>
+                                            <span>${activeTasks} مهام نشطة</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>${completedTasks} مهام مكتملة</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeTeamManageModal() {
+            document.getElementById('teamManageModal').classList.remove('active');
+        }
+
+        function exportTeam() {
+            const dataStr = JSON.stringify(teamMembers, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `team-members-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('تم تصدير قائمة الفريق بنجاح', 'success');
+        }
+
+        function importTeam() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const importedMembers = JSON.parse(e.target.result);
+                            
+                            if (confirm(`هل تريد استيراد ${importedMembers.length} عضو؟ سيتم دمجهم مع الأعضاء الحاليين.`)) {
+                                importedMembers.forEach(member => {
+                                    if (!member.id) member.id = generateId();
+                                    if (!teamMembers.find(m => m.id === member.id)) {
+                                        teamMembers.push(member);
+                                    }
+                                });
+                                
+                                saveTeamMembers();
+                                renderTeamMembers();
+                                updateTaskAssigneeOptions();
+                                manageTeam(); // Refresh the management modal
+                                showNotification('تم استيراد الأعضاء بنجاح', 'success');
+                            }
+                        } catch (error) {
+                            showNotification('خطأ في قراءة الملف', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+
         // Calendar generation
         function generateCalendar() {
             const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
             
             // Days of week headers
-            const daysOfWeek = ['أحد', 'إثنين', 'ثلاثا', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+            const daysOfWeek = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
             daysOfWeek.forEach(day => {
                 const dayHeader = document.createElement('div');
                 dayHeader.textContent = day;
@@ -1027,7 +1563,7 @@
             }
         }
 
-        // Task management
+        // Task management functions (keeping existing functionality)
         function openTaskModal(taskId = null) {
             const modal = document.getElementById('taskModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -1143,6 +1679,7 @@
             
             saveTasks();
             renderTasks();
+            renderTeamMembers(); // Update task counts for team members
             updateStats();
             generateCalendar();
             closeTaskModal();
@@ -1302,6 +1839,7 @@
                 task.updatedAt = new Date().toISOString();
                 saveTasks();
                 renderTasks();
+                renderTeamMembers(); // Update task counts
                 updateStats();
                 
                 const message = task.status === 'completed' ? 'تم إكمال المهمة' : 'تم إلغاء إكمال المهمة';
@@ -1314,6 +1852,7 @@
                 tasks = tasks.filter(t => t.id !== taskId);
                 saveTasks();
                 renderTasks();
+                renderTeamMembers(); // Update task counts
                 updateStats();
                 generateCalendar();
                 showNotification('تم حذف المهمة بنجاح', 'success');
@@ -1427,9 +1966,9 @@
         document.head.appendChild(style);
 
         // Close modal when clicking outside
-        document.getElementById('taskModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeTaskModal();
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
             }
         });
 
@@ -1441,15 +1980,23 @@
                 openTaskModal();
             }
             
-            // Escape to close modal
+            // Escape to close modals
             if (e.key === 'Escape') {
-                closeTaskModal();
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
             }
             
             // Ctrl/Cmd + F to focus search
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
+            }
+            
+            // Ctrl/Cmd + T to add team member
+            if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+                e.preventDefault();
+                openTeamModal();
             }
         });
 
@@ -1463,25 +2010,6 @@
                 localStorage.setItem('taskDraft', JSON.stringify(draft));
             }, 1000);
         });
-
-        // Load draft when opening modal
-        function loadDraft() {
-            const draft = localStorage.getItem('taskDraft');
-            if (draft && !editingTaskId) {
-                const draftData = JSON.parse(draft);
-                Object.keys(draftData).forEach(key => {
-                    const element = document.getElementById(key);
-                    if (element) {
-                        element.value = draftData[key];
-                    }
-                });
-            }
-        }
-
-        // Clear draft when task is saved
-        function clearDraft() {
-            localStorage.removeItem('taskDraft');
-        }
     </script>
 </body>
 </html>
